@@ -1,0 +1,40 @@
+# Loads default set of integrations. Do not remove.
+default_config:
+
+# Text to speech
+tts:
+  - platform: google_translate
+
+sensor:
+  - platform: systemmonitor
+    resources:
+      - type: processor_use
+      - type: processor_temperature
+      - type: memory_free
+      - type: disk_use
+      - type: disk_use_percent
+        arg: /
+      - type: disk_free
+
+automation: !include automations.yaml
+script: !include scripts.yaml
+scene: !include scenes.yaml
+
+stream:
+camera:
+  - platform: generic
+    name: "cam1"
+    stream_source: !secret annke_nvr_cam1
+    authentication: basic
+  - platform: generic
+    name: "cam2"
+    stream_source: !secret annke_nvr_cam2
+    authentication: basic
+  - platform: generic
+    name: "cam3"
+    stream_source: !secret annke_nvr_cam3
+    authentication: basic
+amcrest:
+  - host: !secret amcrest_ptz_ip
+    username: !secret amcrest_username
+    password: !secret amcrest_password

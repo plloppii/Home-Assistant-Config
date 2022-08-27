@@ -1,0 +1,16 @@
+- id: '1661355840162'
+  alias: Notify when backups stale
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - binary_sensor.backups_stale
+    from: 'off'
+    to: 'on'
+  condition: []
+  action:
+  - service: notify.notify
+    data:
+      title: Backups stale
+      message: Your backups are not working!
+  mode: single
