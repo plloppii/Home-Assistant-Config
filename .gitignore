@@ -11,6 +11,9 @@ known_devices.yaml
 #Home assistant db files
 /*.db*
 
+#Ignore frigate config, generate using env variables
+frigate.yml
+
 # Python gitignores
 # Byte-compiled / optimized / DLL files
 __pycache__/
