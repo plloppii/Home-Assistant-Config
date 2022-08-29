@@ -12,7 +12,10 @@ known_devices.yaml
 /*.db*
 
 #Ignore frigate config, generate using env variables
+configuration.yaml
 frigate.yml
+secrets.env
+setup.log
 
 # Python gitignores
 # Byte-compiled / optimized / DLL files
