@@ -8,6 +8,10 @@ ip_bans.yaml
 secrets.yaml
 known_devices.yaml
 
+#Home assistant db files
+/*.db*
+
+# Python gitignores
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -53,7 +57,7 @@ coverage.xml
 .ropeproject
 
 # Django stuff:
-*.log
+*.log*
 *.pot
 
 # Sphinx documentation
