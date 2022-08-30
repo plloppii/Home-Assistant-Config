@@ -27,17 +27,5 @@ stream:
 camera:
   - platform: generic
     name: "cam1"
-    stream_source: !secret annke_nvr_cam1
-    authentication: basic
-  - platform: generic
-    name: "cam2"
-    stream_source: !secret annke_nvr_cam2
-    authentication: basic
-  - platform: generic
-    name: "cam3"
-    stream_source: !secret annke_nvr_cam3
-    authentication: basic
-amcrest:
-  - host: !secret amcrest_ptz_ip
-    username: !secret amcrest_username
-    password: !secret amcrest_password
+shell_command:
+  setup: "/config/scripts/setup.sh > /config/setup.log"

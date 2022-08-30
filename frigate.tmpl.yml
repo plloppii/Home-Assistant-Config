@@ -1,0 +1,64 @@
+mqtt:
+  host: $MQTT_HOST
+  user: $MQTT_USERNAME
+  password: $MQTT_PASSWORD
+
+detectors:
+  coral:
+    type: edgetpu
+    device: usb
+
+cameras:
+  cam1:
+    ffmpeg:
+      inputs:
+        - path: $ANNKE_NVR_CAM1
+          roles:
+              - detect
+              - clips
+              - rtmp
+              
+objects:
+  track:
+    - person
+    - dog
+    - bicycle
+    - cat
+
+snapshots:
+  enabled: true
+  timestamp: false
+  bounding_box: true
+  retain:
+    default: 3
+    
+  # cam2:
+  #   ffmpeg:
+  #     inputs:
+  #       - path: $ANNKE_NVR_CAM2
+  #         roles:
+  #             - detect
+  #   detect:
+  #     width: 960
+  #     height: 480
+  #     fps: 2
+  # cam3:
+  #   ffmpeg:
+  #     inputs:
+  #       - path: $ANNKE_NVR_CAM3
+  #         roles:
+  #             - detect
+  #   detect:
+  #     width: 960
+  #     height: 480
+  #     fps: 2
+  # ptz:
+  #   ffmpeg:
+  #     inputs:
+  #       - path: $AMCREST_PTZ
+  #         roles:
+  #             - detect
+  #   detect:
+  #     width: 2560
+  #     height: 1440
+  #     fps: 2

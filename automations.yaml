@@ -2,15 +2,24 @@
   alias: Notify when backups stale
   description: ''
   trigger:
-  - platform: state
-    entity_id:
-    - binary_sensor.backups_stale
-    from: 'off'
-    to: 'on'
+    - platform: state
+      entity_id:
+        - binary_sensor.backups_stale
+      from: 'off'
+      to: 'on'
   condition: []
   action:
-  - service: notify.notify
-    data:
-      title: Backups stale
-      message: Your backups are not working!
+    - service: notify.notify
+      data:
+        title: Backups stale
+        message: Your backups are not working!
   mode: single
+
+- id: "Startup Script"
+  initial_state: true
+  alias: System Startup Notification
+  trigger:
+    platform: homeassistant
+    event: start
+  action:
+    - service: shell_command.setup
