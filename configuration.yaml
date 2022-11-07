@@ -23,9 +23,35 @@ scene: !include scenes.yaml
 frontend:
   themes: !include_dir_merge_named themes
 
+ffmpeg:
 stream:
 camera:
   - platform: generic
-    name: "cam1"
+    name: "wyzeCam1"
+    stream_source: !secret wyze_cam1
+    authentication: digest
+    rtsp_transport: udp
+  - platform: generic
+    name: "wyzeCam2"
+    stream_source: !secret wyze_cam2
+    authentication: digest
+    rtsp_transport: udp
+  - platform: generic
+    name: "ptz"
+    stream_source: !secret amcrest_ptz
+    authentication: digest
+    rtsp_transport: udp
+  - platform: ffmpeg
+    name: "ptz_vertical"
+    input: !secret amcrest_ptz
+    extra_arguments: -vf "transpose=1"
+
+amcrest:
+  - host: !secret amcrest_ptz_ip
+    username: !secret amcrest_username
+    password: !secret amcrest_password
+    stream_source: "rtsp"
+    resolution: "low"
+
 shell_command:
   setup: "/config/scripts/setup.sh > /config/setup.log"
