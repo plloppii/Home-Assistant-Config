@@ -23,3 +23,11 @@
     event: start
   action:
     - service: shell_command.setup
+- id: '1662837841101'
+  alias: Ring Keypad Automations
+  description: ''
+  use_blueprint:
+    path: ImSorryButWho/synchronize-ring-alarm-keypad-v2-with-alarmo.yaml
+    input:
+      keypad: bd46734ddaacc61288e4371c1b68b832
+      alarm: alarm_control_panel.alarmo
