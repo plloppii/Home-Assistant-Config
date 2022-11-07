@@ -1,0 +1,120 @@
+# Loads default set of integrations. Do not remove.
+default_config:
+
+# Text to speech
+tts:
+  - platform: google_translate
+
+logger:
+  default: warning
+  logs:
+    custom_components.webrtc: debug
+
+sensor:
+  - platform: systemmonitor
+    resources:
+      - type: processor_use
+      - type: processor_temperature
+      - type: memory_free
+      - type: disk_use
+      - type: disk_use_percent
+        arg: /
+      - type: disk_free
+
+automation: !include automations.yaml
+script: !include scripts.yaml
+scene: !include scenes.yaml
+
+http:
+  use_x_forwarded_for: true
+  trusted_proxies:
+    - 172.30.33.0/24
+
+frontend:
+  themes: !include_dir_merge_named themes
+
+ffmpeg:
+stream:
+camera:
+  - platform: generic
+    name: "wyzeCam1"
+    stream_source: !secret wyze_cam1
+    authentication: digest
+    rtsp_transport: udp
+  - platform: generic
+    name: "wyzeCam2"
+    stream_source: !secret wyze_cam2
+    authentication: digest
+    rtsp_transport: udp
+  - platform: generic
+    name: "ptz"
+    stream_source: !secret amcrest_ptz
+    authentication: digest
+    rtsp_transport: udp
+  - platform: ffmpeg
+    name: "ptz_vertical"
+    input: !secret amcrest_ptz
+    extra_arguments: -vf "transpose=1"
+
+amcrest:
+  - host: !secret amcrest_ptz_ip
+    username: !secret amcrest_username
+    password: !secret amcrest_password
+    stream_source: "rtsp"
+    resolution: "low"
+
+shell_command:
+  setup: "/config/scripts/setup.sh > /config/setup.log"
+
+template:
+  - sensor:
+      - name: "vera_hotend_actual"
+        state: "{{ states.sensor.vera.attributes['extruder']['temperature'] | float | round(1) if is_state('sensor.vera', 'OK') else None }}"
+        state_class: measurement
+        unit_of_measurement: "°C"
+      - name: "vera_hotend_target"
+        state: "{{ states.sensor.vera.attributes['extruder']['target'] | float | round(1) if is_state('sensor.vera', 'OK') else None }}"
+        state_class: measurement
+        unit_of_measurement: "°C"
+      - name: "vera_bed_actual"
+        state: "{{ states.sensor.vera.attributes['heater_bed']['temperature'] | float | round(1) if is_state('sensor.vera', 'OK') else None }}"
+        state_class: measurement
+        unit_of_measurement: "°C"
+      - name: "vera_bed_target"
+        state: "{{ states.sensor.vera.attributes['heater_bed']['target'] | float | round(1) if is_state('sensor.vera', 'OK') else None }}"
+        state_class: measurement
+        unit_of_measurement: "°C"
+      - name: "vera_state"
+        state: "{{ states.sensor.vera.attributes['print_stats']['state'] if is_state('sensor.vera', 'OK') else None }}"
+        icon: mdi:printer-3d
+      - name: "vera_current_print"
+        state: "{{ states.sensor.vera.attributes['print_stats']['filename'] if is_state('sensor.vera', 'OK') else None }}"
+      - name: "vera_current_progress"
+        state: "{{ (states.sensor.vera.attributes['display_status']['progress'] * 100) | round(1) if is_state('sensor.vera', 'OK') else None }}"
+        unit_of_measurement: "%"
+        icon: mdi:file-percent
+      - name: "vera_print_time"
+        state: '{{ states.sensor.vera.attributes[''print_stats''][''print_duration''] | timestamp_custom("%H:%M:%S", 0) if is_state(''sensor.vera'', ''OK'') else None }}'
+        icon: mdi:clock-start
+      - name: "vera_time_remaining"
+        state: "{{ (((states.sensor.vera.attributes['print_stats']['print_duration'] / states.sensor.vera.attributes['display_status']['progress'] - states.sensor.vera.attributes['print_stats']['print_duration']) if states.sensor.vera.attributes['display_status']['progress'] > 0 else 0) | timestamp_custom('%H:%M:%S', 0)) if is_state('sensor.vera', 'OK') else None }}"
+        icon: mdi:clock-end
+      - name: "vera_eta"
+        state: '{{ (as_timestamp(now()) + 2 * 60 * 60 + ((states.sensor.vera.attributes[''print_stats''][''print_duration''] / states.sensor.vera.attributes[''display_status''][''progress''] - states.sensor.vera.attributes[''print_stats''][''print_duration'']) if states.sensor.vera.attributes[''display_status''][''progress''] > 0 else 0)) | timestamp_custom("%H:%M:%S", 0) if is_state(''sensor.vera'', ''OK'') else None }}'
+        icon: mdi:clock-outline
+
+rest:
+  scan_interval: 5
+  resource: "http://10.1.10.30:7125/printer/objects/query?heater_bed&extruder&print_stats&toolhead&display_status&virtual_sdcard"
+  sensor:
+    - name: "Vera"
+      json_attributes_path: "$.result.status"
+      json_attributes:
+        - heater_bed
+        - extruder
+        - print_stats
+        - toolhead
+        - display_status
+        - virtual_sdcard
+      value_template: >-
+        {{ 'OK' if ('result' in value_json) else None }}
